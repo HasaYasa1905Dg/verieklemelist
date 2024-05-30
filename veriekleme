@@ -1,0 +1,91 @@
+<?php
+session_start();
+?>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+</head>
+<body>
+
+<?php
+include("baglanti.php");
+?>
+<form method="post" enctype="multipart/form-data">
+		<table align="center">
+				<tr>
+					<td>Adı Soyadı</td> 
+					<td><input type="text" name="adisoyadi"  autocomplete="off"></td>
+				</tr>
+				<tr>
+					<td>Mevki</td> 
+					<td><input type="text" name="mevki"   autocomplete="off"></td>
+				</tr>
+				<tr>
+					<td>Yaş</td> 
+					<td><input type="text" name="yas"   autocomplete="off"></td>
+				</tr>
+				<tr>
+					<td>Resim </td> 
+					<td><input type="file" name="resim" ></td>
+				</tr>
+				<tr>
+					<td>Forma Numarası</td> 
+					<td><input type="text" name="numara"   autocomplete="off"></td>
+				</tr>				
+				<tr>
+					<td><input type="submit" name="kaydet" value="KAYDET"></td>
+					<td><?php
+						if (isset($_POST['kaydet'])) {
+							$adisoyadi=trim($_POST['adisoyadi']);
+							$mevki = trim($_POST['mevki']);
+							$yas = trim($_POST['yas']);
+							$numara = trim($_POST['numara']);
+							$resimadi = $_FILES['resim']['name'];
+							$resimyol = $_FILES['resim']['tmp_name'];
+							$uzanti = @end(explode('.',$resimadi));
+							$yeniresimadi = uniqid(). "." .$uzanti ;
+							$uzantilar =array("jpg","png","jpeg","gif","bmp");
+
+							if (in_array($uzanti,$uzantilar)) 
+							{
+								$resimkontrol = move_uploaded_file($resimyol, "resimler/$yeniresimadi");
+								if ($resimkontrol) 
+								{
+									if ($adisoyadi=="" or $mevki=="" or $yas=="" or $numara=="") 
+									{
+										echo "Lütfen tüm alanları doldurunuz";
+									}
+									else 
+									{
+										$kontrol = $db->query("INSERT INTO fenerbahce VALUES (null, '$adisoyadi','$mevki','$yas', '$yeniresimadi' , '$numara')");
+
+											if ($kontrol->rowCount() == 1) 
+											{
+												echo "Kayıt yapıldı";
+											}
+											else 
+											{
+												echo "Kayıt yapılamadı. Tekrar deneyin";
+											}
+									}
+								}
+								else 
+								{
+									echo "Resim yüklenemedi tekrar deneyin";
+								}
+							}
+							else
+							{
+								echo "Yalnızca resim dosyaları eklenebilir.";
+							}
+						}
+				?></td>
+				</tr>
+		</table>
+	</form>
+
+</body>
+</html>
